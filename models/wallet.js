@@ -1,0 +1,63 @@
+const mongoose=require('mongoose')
+const assetSchema=mongoose.Schema({
+assets:{type:String},
+walletBalance:{type:String},
+unrealizedProfit:{type:String},
+marginBalance:{type:String},
+maintMargin:{type:String},
+initialMargin:{type:String},
+positionInitialMargin:{type:String},
+openOrderInitialMargin:{type:String},
+maxWithdrawAmount:{type:String},
+crossWalletBalance:{type:String},
+crossUnPnl:{type:String},
+availableBalance:{type:String},
+marginAvailable:{type:Boolean},
+updateTime:{type:Number}
+})
+const positionSchema=mongoose.Schema({
+symbol:{type:String},
+initialMargin:{type:String},
+maintMargin:{type:String},
+unrealizedProfit:{type:String},
+positionInitialMargin:{type:String},
+openOrderInitialMargin:{type:String},
+leverage:{type:String},
+isolated:{type:Boolean},
+entryPrice:{type:String},
+maxNotional:{type:String},
+positonSide:{type:String},
+positionAmt:{type:String},
+notional:{type:String},
+isolatedWallet:{type:String},
+updateTime:{type:Number},
+bidNotional:{type:String},
+askNotional:{type:String}
+})
+const walletSchema=mongoose.Schema({
+ email:{
+  type:String,
+  required:true,
+  unique:true,
+  ref:'user'
+ },
+ feeTier:{type:Number},
+ canTrade:{type:Boolean},
+ canDeposit:{type:Boolean},
+ updateTime:{type:Number},
+ totalInitialMargin:{type:String},
+ totalMaintMargin:{type:String},
+ totalWalletBalance:{type:String},
+ totalUnrealizedProfit:{type:String},
+ totalMarginBalance:{type:String},
+ totalPositionInitialMargin:{type:String},
+ totalOpenOrderInitialMargin:{type:String},
+ totalCrossWalletBalance:{type:String},
+ totalCrossUnPnl:{type:String},
+ availavleBalance:{type:String},
+ maxWithdrawAmount:{type:String},
+ assets:[assetSchema],
+ postions:[positionSchema]
+})
+const wallet=mongoose.model('wallet',walletSchema)
+module.exports=wallet
