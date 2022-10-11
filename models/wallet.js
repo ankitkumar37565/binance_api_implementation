@@ -1,6 +1,6 @@
 const mongoose=require('mongoose')
 const assetSchema=mongoose.Schema({
-assets:{type:String},
+asset:{type:String},
 walletBalance:{type:String},
 unrealizedProfit:{type:String},
 marginBalance:{type:String},
@@ -57,7 +57,7 @@ const walletSchema=mongoose.Schema({
  availavleBalance:{type:String},
  maxWithdrawAmount:{type:String},
  assets:[assetSchema],
- postions:[positionSchema]
+ positions:[positionSchema]
 })
 const wallet=mongoose.model('wallet',walletSchema)
 module.exports=wallet

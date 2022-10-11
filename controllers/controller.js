@@ -15,6 +15,8 @@ exports.register=async function(req,res){
  await user.save()
  let wallet=new Wallet({email:req.body.email})
  await wallet.save()
+ let trade=new Trade({email:req.body.email})
+ await trade.save()
  return res.status(200).send({success:true,message:'User Successfully Registered',data:user})
 }
 exports.login=async function(req,res){
@@ -41,11 +43,28 @@ let key=req.user.apiKey
 let secret=req.user.apiSecret
 let sig=await crypto.genSig(secret,data)
 let result=await BE.accountInformation(data,key,sig)
-// let wallet=await Wallet.findOne({email:req.user.email})
-// let keys=Object.keys(result.data)
-// keys.forEach((key)=>{
-//  wallet.key=result.key
-// })
+let wallet=await Wallet.findOne({email:req.user.email})
+let keys=Object.keys(result.data)
+keys=keys.filter((k)=>{
+ if(k!='positions' && k!='assets')
+{return k}
+})
+keys.forEach((key)=>{
+ wallet[key]=result.data[key]
+})
+let assets=result.data.assets
+assets=assets.filter((v)=>{
+ if(parseFloat(v.walletBalance)>0){return v}
+})
+wallet.assets=assets
+let positions=result.data.positions
+positions=positions.filter((position)=>{
+ if(parseFloat(position.positionAmt)>0){
+  return position
+ }
+})
+wallet.positions=positions
+await wallet.save()
 return res.status(result.status).send(result.data)
 }
 exports.getPositionMode=async function(req,res){
@@ -98,6 +117,11 @@ let key=req.user.apiKey
 let secret=req.user.apiSecret
 let sig=await crypto.genSig(secret,data)
 let result=await BE.createOrder(data,key,sig)
+if(result.status==200){
+ let trade=await Trade.findOne({email:req.user.email})
+ trade.trades.push(result.data)
+ await trade.save()
+}
 return res.status(result.status).send(result.data)
 }
 exports.queryOrder=async function(req,res){
