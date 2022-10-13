@@ -1,6 +1,6 @@
 const mongoose=require('mongoose')
-const tradeSchema=mongoose.Schema({
- email:{type:String,required:true},
+const fxTradeSchema=({
+ email:{type:String},
  clientOrderId:{type:String},
  cumQty:{type:String},
  cumQuote:{type:String},
@@ -25,5 +25,5 @@ const tradeSchema=mongoose.Schema({
  workingType:{type:String},
  priceProtect:{type:Boolean}
 })
-const Trade=mongoose.model('Trade',tradeSchema)
-module.exports=Trade
+const FxTrade=mongoose.model('FxTrade',fxTradeSchema)
+module.exports=FxTrade

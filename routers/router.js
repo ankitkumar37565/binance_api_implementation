@@ -17,6 +17,10 @@ router.get('/getPositonMode',auth,handle(controller.getPositionMode))
 router.post('/changePositionMode',auth,handle(controller.changePositionMode))
 router.post('/changeInitialLeverage',auth,handle(controller.changeInitialLeverage))
 router.post('/changeMarginType',auth,handle(controller.changeMarginType))
+router.get('/openPosition',auth,handle(controller.openPosition))
+router.get('/tradeHistory',auth,handle(controller.tradeHistory))
+router.get('/getAccountBalanceDb',auth,handle(controller.getAccountBalanceDb))
+router.get('/getFxAccountBalanceDb',auth,handle(controller.getFxAccountBalanceDb))
 
 //trade_routes
 router.post('/createOrder',auth,handle(controller.createOrder))
@@ -29,7 +33,10 @@ router.get('/allOrder',auth,handle(controller.allOrder))
 router.post('/modifyIsolatedPositionMargin',auth,handle(controller.modifyIsolatedPositionMargin))
 router.get('/currentPositionInformation',auth,handle(controller.currentPositionInformation))
 router.get('/accountTradeList',auth,handle(controller.accountTradeList))
-
+//user stream routes
+router.post('/postListenKey',auth,handle(controller.postListenKey))
+router.put('/putListenKey',auth,handle(controller.putListenKey))
+router.delete('/deleteListenKey',auth,handle(controller.deleteListenKey))
 
 
 module.exports=router

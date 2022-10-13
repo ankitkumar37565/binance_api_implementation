@@ -21,6 +21,7 @@ async accountInformation(data, k, s) {
  }};
  console.log(requestdata.url)
  const result = await axios(requestdata);
+ console.log('-----------')
  return result;
 }
 
@@ -232,6 +233,42 @@ async userCommissionRate(data, k, s) {
     return result;
   }
   
+  //user stream endpoint
+  async startUserDataStream(k) {
+    let requestdata = {
+      method: 'POST',
+      url: base + "/fapi/v1/listenKey",
+      headers: {
+        "X-MBX-APIKEY": k
+      }};
+      console.log(requestdata.url)
+      const result = await axios(requestdata);
+      return result;
+  }
+  async keepAliveUserDataStream(k) {
+    let requestdata = {
+      method: 'PUT',
+      url: base + "/fapi/v1/listenKey",
+      headers: {
+        "X-MBX-APIKEY": k
+      }};
+      console.log(requestdata.url)
+      const result = await axios(requestdata);
+      return result;
+    }
+    async closeUserDataStream(k) {
+      let requestdata = {
+        method: 'DELETE',
+        url: base + "/fapi/v1/listenKey",
+        headers: {
+          "X-MBX-APIKEY": k
+        }};
+        console.log(requestdata.url)
+        const result = await axios(requestdata);
+        return result;
+      }
+
+  //----------------------------------------------
 }
-//----------------------------------------------
+
 module.exports=binanceEndpoint

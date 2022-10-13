@@ -5,6 +5,8 @@ const router=require('./routers/router')
 const cookieParser=require('cookie-parser')
 require('dotenv').config({path:__dirname+'/config/.env'})
 require('./config/db')
+// const fxPayload=require('./controllers/fxPayload')
+// fxPayload()
 
 app.use(express.json())
 app.use(cookieParser())

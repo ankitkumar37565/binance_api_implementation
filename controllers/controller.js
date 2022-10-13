@@ -2,10 +2,64 @@ const binance_endpoint=require('../binance_endpoint')
 const BE=new binance_endpoint()
 const crypto=require('../utils/crypto')
 const User=require('../models/user')
-const Trade=require('../models/trade')
+const fxTrade=require('../models/fxTrade')
+const FxWallet=require('../models/fxWallet')
 const Wallet=require('../models/wallet')
 const bcrypt=require('bcrypt')
 const qs=require('qs')
+const WS=require('ws')
+const path=require('path')
+require('dotenv').config({path:path.join(__dirname,'../config/.env')})
+const BASE=process.env.TESTNET_FX_WEBSOCKET_BASE_URL
+
+//fx market ticker
+
+let fxCoinData=[]
+
+let fxTickerStart=async function(){
+ const ws=new WS(BASE+'/ws/!ticker@arr')
+ console.log('Fx Market Ticker Stream Strarted',Date.now())
+ ws.on('message',async function(data){
+  let coinData=JSON.parse(data)
+  fxCoinData=coinData
+ })
+ ws.on('error',async function(e){
+  console.log('Fx Market Ticker Stream Error',Date.now())
+  console.log(e)
+ })
+ ws.on('disconnect',async function(){
+  console.log('Fx Market Ticker Stream Error',Date.now())
+ })
+ ws.on('close',async function(){
+  console.log('Fx Market Ticker Stream Closed',Date.now())
+  fxTickerStart()
+ })
+}
+fxTickerStart();
+
+//individual ticker
+
+let currentPrice=[]
+let currentPriceWs=async function(){
+const ws=new WS(BASE+'/ws/btcusdt'+'@ticker')
+console.log('individual ticker stream started',Date.now())
+ws.on('message',async function(data){
+ let parsedData=JSON.parse(data)
+ currentPrice=parsedData
+})
+ws.on('error',async function(e){
+console.log('error in individual ticker stream\n',e)
+})
+ws.on('disconnected',async function(){
+ console.log('individual ticker stream disconnected')
+})
+ws.on('close',async function(){
+ console.log('individual ticker stream closed')
+ currentPriceWs()
+})
+}
+currentPriceWs()
+
 
 //user controllers
 exports.register=async function(req,res){
@@ -15,8 +69,8 @@ exports.register=async function(req,res){
  await user.save()
  let wallet=new Wallet({email:req.body.email})
  await wallet.save()
- let trade=new Trade({email:req.body.email})
- await trade.save()
+ let fxWallet=new FxWallet({email:req.body.email})
+ await fxWallet.save()
  return res.status(200).send({success:true,message:'User Successfully Registered',data:user})
 }
 exports.login=async function(req,res){
@@ -43,7 +97,10 @@ let key=req.user.apiKey
 let secret=req.user.apiSecret
 let sig=await crypto.genSig(secret,data)
 let result=await BE.accountInformation(data,key,sig)
+console.log('------------------------------------')
+if(result.status==200 && result.data){
 let wallet=await Wallet.findOne({email:req.user.email})
+// if(!wallet){await new Wallet({email:req.user.email}).save()}
 let keys=Object.keys(result.data)
 keys=keys.filter((k)=>{
  if(k!='positions' && k!='assets')
@@ -66,7 +123,7 @@ positions=positions.filter((position)=>{
 wallet.positions=positions
 await wallet.save()
 return res.status(result.status).send(result.data)
-}
+}}
 exports.getPositionMode=async function(req,res){
  let data={}
  data.timestamp=Date.now()
@@ -107,6 +164,29 @@ let sig=await crypto.genSig(secret,data)
 let result=await BE.changeMarginType(data,key,sig)
 return res.status(result.status).send(result.data)
 }
+exports.getAccountBalanceDb=async function(req,res){
+// await accountInformation(req,res)
+let wallet=await Wallet.findOne({email:req.user.email})
+// var result={}
+// await wallet.assets.forEach((v)=>{
+// result[v.asset]=v.walletBalance
+// })
+return res.status(200).send({success:true,message:'account balance fetched successfully',data:wallet})
+}
+exports.openPosition=async function(req,res){
+await accountInformation(req,res)
+let wallet=await Wallet.findOne({email:req.user.email})
+result=wallet.positions
+return res.status(200).send({success:true,message:'all open positions fetched',data:result})
+}
+exports.tradeHistory=async function(req,res){
+let trade=await Trade.find({}).sort({updateTime:-1})
+return res.status(200).send({success:true,message:'Trade History Fetched',data:trade})
+}
+exports.getFxAccountBalanceDb=async function(req,res){
+ let fxWallet=await FxWallet.findOne({email:req.user.email})
+ return res.status(200).send({success:true,message:'fxAccount Balance Fetched',data:fxWallet})
+}
 
 //trade controllers
 exports.createOrder=async function(req,res){
@@ -117,12 +197,37 @@ let key=req.user.apiKey
 let secret=req.user.apiSecret
 let sig=await crypto.genSig(secret,data)
 let result=await BE.createOrder(data,key,sig)
-if(result.status==200){
- let trade=await Trade.findOne({email:req.user.email})
- trade.trades.push(result.data)
+//check if opposite side trade avail in db if yes then 
+//
+if(result.status==200 && result.data){
+ let trade=await fxTrade.findOne({email:req.user.email,symbol:req.body.symbol})
+ if(trade){
+  console.log('------------------------------------')
+  let oppositeTradeSide=(req.body.side=='BUY')?'SELL':'BUY'
+  if(trade.side==oppositeTradeSide){
+   if(trade.origQty<result.data.origQty){
+    trade.side=result.data.side
+    trade.origQty=(parseFloat(result.data.origQty)-parseFloat(trade.origQty)).toString()
+    await trade.save()
+   }
+   else if(trade.origQty>result.data.origQty){
+    trade.origQty=(parseFloat(trade.origQty)-parseFloat(result.data.origQty)).toString()
+    await trade.save()
+   }
+   else{await fxTrade.findOneAndDelete({clientOrderId:trade.clientOrderId})}
+  }
+  else{
+   trade.origQty=(parseFloat(trade.origQty)+parseFloat(result.data.origQty)).toString()
+   await trade.save()
+  }
+ }
+ else{
+ let trade=new fxTrade({email:req.user.email,...result.data})
  await trade.save()
 }
 return res.status(result.status).send(result.data)
+}
+return res.status(200).send({success:false,message:'Order failed'})
 }
 exports.queryOrder=async function(req,res){
 data={symbol:req.body.symbol,orderId:req.body.orderId}
@@ -213,4 +318,21 @@ let secret=req.user.apiSecret
 let sig=await crypto.genSig(secret,data)
 let result=await BE.accountTradeList(data,key,sig)
 return res.status(result.status).send(result.data)
+}
+exports.postListenKey=async function(req,res){
+let key=req.user.apiKey
+let result=await BE.startUserDataStream(key)
+process.env.LISTEN_KEY=result.data.listenKey
+console.log('listen key--->',process.env.LISTEN_KEY)
+return res.status(result.status).send(result.data)
+}
+exports.putListenKey=async function(req,res){
+ let key=req.user.apiKey
+ let result=await BE.keepAliveUserDataStream(key)
+ return res.status(result.status).send(result.data)
+}
+exports.deleteListenKey=async function(req,res){
+ let key=req.user.apiKey
+ let result=await BE.closeUserDataStream(key)
+ return res.status(result.status).send(result.data)
 }
