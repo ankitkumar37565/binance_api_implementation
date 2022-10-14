@@ -1,7 +1,7 @@
 const WS = require("ws");
 const path = require("path");
 const listen_key =
-  "QNgo6b7IyyZaSPIjp91lGTlQv5eiQscFdPssSri570yygvsFxGYPQbA8Vzmh4Jot";
+  "bHXJ7NZLilimQjggfCSVxADDLNkTSfsWze24k7RAG6CbMrSg368GT04w0OqtpDsS";
 require("dotenv").config({ path: path.join(__dirname, "../config/.env") });
 const BASE = process.env.TESTNET_FX_WEBSOCKET_BASE_URL;
 const FxWallet=require("../models/fxWallet");
@@ -9,7 +9,9 @@ const FxOpenOrder = require("../models/fxOpenOrder");
 const FxTrade = require("../models/fxTrade");
 const PositionLog = require("../models/positionLog");
 const Wallet=require('../models/wallet')
+const User=require('../models/user')
 const email = "ankit@nextazy.com";
+const controller=require('./controller')
 
 let marketPrice=[]
 let marketPriceWs=async function(){
@@ -73,6 +75,9 @@ const fxPayload = async function () {
 
 
         if(data.o.X=='FILLED'){
+        let user=await User.findOne({email:email})
+        // let req={};req.user=user;let res={}
+        let accInfo=await controller.accountInformation(user)
          await FxOpenOrder.findOneAndDelete({email:email,i:data.o.i})
          let tradePresent=await FxTrade.findOne({email:email,symbol:data.o.s,positionSide:data.o.ps})
          if(tradePresent){

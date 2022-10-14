@@ -91,17 +91,17 @@ exports.logout=async function(req,res){
 }
 
 //account controllers
-exports.accountInformation=async function(req,res){
+exports.accountInformation=async function(user){
 let data={}
 data.timestamp=Date.now()
 data=qs.stringify(data)
-let key=req.user.apiKey
-let secret=req.user.apiSecret
+let key=user.apiKey
+let secret=user.apiSecret
 let sig=await crypto.genSig(secret,data)
 let result=await BE.accountInformation(data,key,sig)
 console.log('------------------------------------')
 if(result.status==200 && result.data){
-let wallet=await Wallet.findOne({email:req.user.email})
+let wallet=await Wallet.findOne({email:user.email})
 // if(!wallet){await new Wallet({email:req.user.email}).save()}
 let keys=Object.keys(result.data)
 keys=keys.filter((k)=>{
@@ -124,7 +124,7 @@ positions=positions.filter((position)=>{
 })
 wallet.positions=positions
 await wallet.save()
-return res.status(result.status).send(result.data)
+// return res.status(result.status).send(result.data)
 }}
 exports.getPositionMode=async function(req,res){
  let data={}

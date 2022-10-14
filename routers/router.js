@@ -12,7 +12,7 @@ router.post('/login',handle(controller.login))
 router.get('/logout',auth,handle(controller.logout))
 
 //account_routes
-router.get('/accountInformation',auth,handle(controller.accountInformation))
+// router.get('/accountInformation',auth,handle(controller.accountInformation))
 router.get('/getPositonMode',auth,handle(controller.getPositionMode))
 router.post('/changePositionMode',auth,handle(controller.changePositionMode))
 router.post('/changeInitialLeverage',auth,handle(controller.changeInitialLeverage))
