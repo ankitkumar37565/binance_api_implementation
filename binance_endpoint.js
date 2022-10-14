@@ -20,9 +20,12 @@ async accountInformation(data, k, s) {
  "X-MBX-APIKEY": k
  }};
  console.log(requestdata.url)
- const result = await axios(requestdata);
- console.log('-----------')
- return result;
+ try{
+
+   const result = await axios(requestdata);
+  //  console.log('-----------')
+   return result;
+  }catch(e){return e.response}
 }
 
 //----------------------------------------------
@@ -34,8 +37,11 @@ async getPositionMode(data, k, s) {
  "X-MBX-APIKEY": k
  }};
  console.log(requestdata.url)
-let result = await axios(requestdata);
- return result;
+ try{
+
+   let result = await axios(requestdata);
+   return result;
+  }catch(e){return e.response}
  }
 
  //----------------------------------------------
@@ -47,8 +53,11 @@ async changePositionMode(data, k, s) {
  "X-MBX-APIKEY": k
  }};
  console.log(requestdata.url)
- const result = await axios(requestdata);
- return result;
+ try{
+  
+   const result = await axios(requestdata);
+   return result;
+  }catch(e){return e.response}
  }
  //----------------------------------------------
  async changeInitialLeverage(data, k, s) {
@@ -59,8 +68,11 @@ async changePositionMode(data, k, s) {
   "X-MBX-APIKEY": k
   }};
   console.log(requestdata.url)
-  const result = await axios(requestdata);
-  return result;
+  try{
+  
+    const result = await axios(requestdata);
+    return result;
+  }catch(e){return e.response}
   }
   
   //----------------------------------------------
@@ -72,8 +84,27 @@ async changePositionMode(data, k, s) {
   "X-MBX-APIKEY": k
   }};
   console.log(requestdata.url)
-  const result = await axios(requestdata);
-  return result;
+  try{
+
+    const result = await axios(requestdata);
+    console.log(Object.keys(result))
+    return result;
+  }
+  catch(e){
+    // console.log('--------')
+    // console.log(Object.keys(e))
+    // console.log(Object.keys(e.message))
+    // console.log(Object.keys(e.name))
+    // console.log(Object.keys(e.code))
+    // console.log(Object.keys(e.config))
+    // console.log(Object.keys(e.request))
+    // console.log(Object.keys(e.response))
+    // console.log(Object.keys(e.response.data))
+    // console.log(e.response.data)
+    // console.log(e.response.status)
+    // console.log('---------')
+    return e.response
+  }
   }
 
 
@@ -88,8 +119,11 @@ headers: {
 "X-MBX-APIKEY": k
 }};
 console.log(requestdata.url)
-const result = await axios(requestdata);
-return result;
+try{
+  
+  const result = await axios(requestdata);
+  return result;
+}catch(e){return e.response}
 }
 //----------------------------------------------
 async queryOrder(data, k, s) {
@@ -100,8 +134,11 @@ headers: {
 "X-MBX-APIKEY": k
 }};
 console.log(requestdata.url)
-const result = await axios(requestdata);
-return result;
+try{
+  
+  const result = await axios(requestdata);
+  return result;
+}catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -113,8 +150,11 @@ async cancelOrder(data, k, s) {
       "X-MBX-APIKEY": k
     }};
 console.log(requestdata.url)
-const result = await axios(requestdata);
-return result;
+try{
+  
+  const result = await axios(requestdata);
+  return result;
+}catch(e){return e.response}
 }
 //----------------------------------------------
 async cancelAllOrder(data, k, s) {
@@ -125,8 +165,11 @@ async cancelAllOrder(data, k, s) {
     "X-MBX-APIKEY": k
   }};
   console.log(requestdata.url)
-  const result = await axios(requestdata);
-  return result;
+  try{
+  
+    const result = await axios(requestdata);
+    return result;
+  }catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -138,8 +181,11 @@ async currentOpenOrder(data, k, s) {
       "X-MBX-APIKEY": k
     }};
     console.log(requestdata.url)
-    const result = await axios(requestdata);
-return result;
+    try{
+  
+      const result = await axios(requestdata);
+      return result;
+    }catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -151,8 +197,11 @@ let requestdata = {
     "X-MBX-APIKEY": k
   }};
   console.log(requestdata.url)
-  const result = await axios(requestdata);
-  return result;
+  try{
+  
+    const result = await axios(requestdata);
+    return result;
+  }catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -164,8 +213,11 @@ async allOrder(data, k, s) {
       "X-MBX-APIKEY": k
     }};
     console.log(requestdata.url)
-    const result = await axios(requestdata);
-return result;
+    try{
+  
+      const result = await axios(requestdata);
+      return result;
+    }catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -177,8 +229,11 @@ async modifyIsolatedPositionMargin(data, k, s) {
 "X-MBX-APIKEY": k
 }};
 console.log(requestdata.url)
-const result = await axios(requestdata);
-return result;
+try{
+  
+  const result = await axios(requestdata);
+  return result;
+}catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -190,8 +245,11 @@ async currentPositionInformation(data, k, s) {
 "X-MBX-APIKEY": k
 }};
 console.log(requestdata.url)
-const result = await axios(requestdata);
-return result;
+try{
+  
+  const result = await axios(requestdata);
+  return result;
+}catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -203,8 +261,11 @@ headers: {
   "X-MBX-APIKEY": k
 }};
 console.log(requestdata.url)
-const result = await axios(requestdata);
-return result;
+try{
+  
+  const result = await axios(requestdata);
+  return result;
+}catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -216,8 +277,11 @@ headers: {
   "X-MBX-APIKEY": k
 }};
 console.log(requestdata.url)
-const result = await axios(requestdata);
-return result;
+try{
+  
+  const result = await axios(requestdata);
+  return result;
+}catch(e){return e.response}
 }
 //----------------------------------------------
 
@@ -229,8 +293,11 @@ async userCommissionRate(data, k, s) {
       "X-MBX-APIKEY": k
     }};
     console.log(requestdata.url)
-    const result = await axios(requestdata);
-    return result;
+    try{
+  
+      const result = await axios(requestdata);
+      return result;
+    }catch(e){return e.response}
   }
   
   //user stream endpoint
@@ -242,8 +309,11 @@ async userCommissionRate(data, k, s) {
         "X-MBX-APIKEY": k
       }};
       console.log(requestdata.url)
-      const result = await axios(requestdata);
-      return result;
+      try{
+  
+        const result = await axios(requestdata);
+        return result;
+      }catch(e){return e.response}
   }
   async keepAliveUserDataStream(k) {
     let requestdata = {
@@ -253,8 +323,11 @@ async userCommissionRate(data, k, s) {
         "X-MBX-APIKEY": k
       }};
       console.log(requestdata.url)
-      const result = await axios(requestdata);
-      return result;
+      try{
+  
+        const result = await axios(requestdata);
+        return result;
+      }catch(e){return e.response}
     }
     async closeUserDataStream(k) {
       let requestdata = {
@@ -264,8 +337,11 @@ async userCommissionRate(data, k, s) {
           "X-MBX-APIKEY": k
         }};
         console.log(requestdata.url)
-        const result = await axios(requestdata);
-        return result;
+        try{
+  
+          const result = await axios(requestdata);
+          return result;
+        }catch(e){return e.response}
       }
 
   //----------------------------------------------

@@ -2,7 +2,8 @@ const binance_endpoint=require('../binance_endpoint')
 const BE=new binance_endpoint()
 const crypto=require('../utils/crypto')
 const User=require('../models/user')
-const fxTrade=require('../models/fxTrade')
+const FxTrade=require('../models/fxTrade')
+const PositionLog=require('../models/positionLog')
 const FxWallet=require('../models/fxWallet')
 const Wallet=require('../models/wallet')
 const bcrypt=require('bcrypt')
@@ -176,13 +177,13 @@ let wallet=await Wallet.findOne({email:req.user.email})
 return res.status(200).send({success:true,message:'account balance fetched successfully',data:wallet})
 }
 exports.openPosition=async function(req,res){
-await accountInformation(req,res)
+// await accountInformation(req,res)
 let wallet=await Wallet.findOne({email:req.user.email})
 result=wallet.positions
 return res.status(200).send({success:true,message:'all open positions fetched',data:result})
 }
 exports.tradeHistory=async function(req,res){
-let trade=await Trade.find({}).sort({updateTime:-1})
+let trade=await PositionLog.find({}).sort({updateTime:-1})
 return res.status(200).send({success:true,message:'Trade History Fetched',data:trade})
 }
 exports.getFxAccountBalanceDb=async function(req,res){
