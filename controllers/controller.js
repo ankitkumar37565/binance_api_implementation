@@ -22,6 +22,7 @@ let fxTickerStart=async function(){
  ws.on('message',async function(data){
   let coinData=JSON.parse(data)
   fxCoinData=coinData
+  // console.log(fxCoinData)
  })
  ws.on('error',async function(e){
   console.log('Fx Market Ticker Stream Error',Date.now())
@@ -46,6 +47,7 @@ console.log('individual ticker stream started',Date.now())
 ws.on('message',async function(data){
  let parsedData=JSON.parse(data)
  currentPrice=parsedData
+ // console.log(currentPrice)
 })
 ws.on('error',async function(e){
 console.log('error in individual ticker stream\n',e)
@@ -200,31 +202,31 @@ let result=await BE.createOrder(data,key,sig)
 //check if opposite side trade avail in db if yes then 
 //
 if(result.status==200 && result.data){
- let trade=await fxTrade.findOne({email:req.user.email,symbol:req.body.symbol})
- if(trade){
-  console.log('------------------------------------')
-  let oppositeTradeSide=(req.body.side=='BUY')?'SELL':'BUY'
-  if(trade.side==oppositeTradeSide){
-   if(trade.origQty<result.data.origQty){
-    trade.side=result.data.side
-    trade.origQty=(parseFloat(result.data.origQty)-parseFloat(trade.origQty)).toString()
-    await trade.save()
-   }
-   else if(trade.origQty>result.data.origQty){
-    trade.origQty=(parseFloat(trade.origQty)-parseFloat(result.data.origQty)).toString()
-    await trade.save()
-   }
-   else{await fxTrade.findOneAndDelete({clientOrderId:trade.clientOrderId})}
-  }
-  else{
-   trade.origQty=(parseFloat(trade.origQty)+parseFloat(result.data.origQty)).toString()
-   await trade.save()
-  }
- }
- else{
- let trade=new fxTrade({email:req.user.email,...result.data})
- await trade.save()
-}
+//  let trade=await fxTrade.findOne({email:req.user.email,symbol:req.body.symbol})
+//  if(trade){
+//   console.log('------------------------------------')
+//   let oppositeTradeSide=(req.body.side=='BUY')?'SELL':'BUY'
+//   if(trade.side==oppositeTradeSide){
+//    if(trade.origQty<result.data.origQty){
+//     trade.side=result.data.side
+//     trade.origQty=(parseFloat(result.data.origQty)-parseFloat(trade.origQty)).toString()
+//     await trade.save()
+//    }
+//    else if(trade.origQty>result.data.origQty){
+//     trade.origQty=(parseFloat(trade.origQty)-parseFloat(result.data.origQty)).toString()
+//     await trade.save()
+//    }
+//    else{await fxTrade.findOneAndDelete({clientOrderId:trade.clientOrderId})}
+//   }
+//   else{
+//    trade.origQty=(parseFloat(trade.origQty)+parseFloat(result.data.origQty)).toString()
+//    await trade.save()
+//   }
+//  }
+//  else{
+//  let trade=new fxTrade({email:req.user.email,...result.data})
+//  await trade.save()
+// }
 return res.status(result.status).send(result.data)
 }
 return res.status(200).send({success:false,message:'Order failed'})

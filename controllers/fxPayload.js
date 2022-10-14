@@ -1,7 +1,7 @@
 const WS = require("ws");
 const path = require("path");
 const listen_key =
-  "";
+  "QNgo6b7IyyZaSPIjp91lGTlQv5eiQscFdPssSri570yygvsFxGYPQbA8Vzmh4Jot";
 require("dotenv").config({ path: path.join(__dirname, "../config/.env") });
 const BASE = process.env.TESTNET_FX_WEBSOCKET_BASE_URL;
 const FxWallet=require("../models/fxWallet");
@@ -11,12 +11,12 @@ const PositionLog = require("../models/positionLog");
 const Wallet=require('../models/wallet')
 const email = "ankit@nextazy.com";
 
-
 let marketPrice=[]
 let marketPriceWs=async function(){
-const ws=new WS(BASE+'/ws/btcusdt@markPrice@1s')
+const ws=new WS(BASE+'/ws/btcusdt@markPrice')
 console.log('marketPrice stream started',Date.now())
 ws.on('message',async function(data){
+  // console.log(JSON.parse(data.toString()))
  let parsedData=JSON.parse(data)
  marketPrice=parsedData
 //  console.log(marketPrice)
@@ -47,20 +47,24 @@ const fxPayload = async function () {
         console.log(
           "balance and position update not include unfilled or cancelled order"
         );
-        // console.log(data)
-        await FxWallet.updateOne(
-          { email: email, "balance.asset": data.a.B[0].a },
-          {
-            $set: {
-              "balance.$.walletBalance": data.a.B[0].wb,
-              "balance.$.crossWalletBalance": data.a.B[0].cw,
-            },
-          }
-        );
+        console.log(data)
+       let fxWallet=await FxWallet.findOne({email:email})
+
+      //  data.a.B.foreach((asset)=>{
+      //   fxWallet.balance[0]=asset
+      //  })
+      // fxWallet.balance[0].walletBalance=data.a.B[0].wb
+      // fxWallet.balance[0].crosswalletBalance=data.a.B[0].cw
+      fxWallet.balance[0]={
+        'asset':data.a.B[0].a,
+        'walletBalance':data.a.B[0].wb,
+        'crossWalletBalance':data.a.B[0].wb
+      }
+      await fxWallet.save()
       }
       if (data && data.e == "ORDER_TRADE_UPDATE") {
         console.log("new order created");
-        // console.log(data)
+        console.log(data)
         let payload = { email: email, ...data.o }//this is payload data
 
         if(data.o.X!=='NEW'||data.o.X!=='PARTIALLY_FILLED'){
@@ -119,7 +123,16 @@ const fxPayload = async function () {
 
 
         else if(data.o.X=='NEW'){
-         await new FxOpenOrder(payload).save()
+          let trade=await FxOpenOrder.findOne({email:email,S:data.o.S,ps:data.o.ps,ap:data.o.ap})
+          // if(trade){
+          //     trade.q=(parseFloat(trade.z)+parseFloat(data.o.z)).toString()
+          //     await trade.save()
+          // }
+          // else{
+
+          //   await new FxOpenOrder(payload).save()
+          // }
+            await new FxOpenOrder(payload).save()
         }
 
 

@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const balanceSchema = mongoose.Schema(
   {
     asset: { type: String },
-    walletBalance: { type: Number },
-    crossWalletBalance: { type: Number },
+    walletBalance: { type: String },
+    crossWalletBalance: { type: String },
   },
   { timestamps: true }
 );
