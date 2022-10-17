@@ -1,7 +1,7 @@
 const WS = require("ws");
 const path = require("path");
 const listen_key =
-  "bHXJ7NZLilimQjggfCSVxADDLNkTSfsWze24k7RAG6CbMrSg368GT04w0OqtpDsS";
+  "md4uxNlefFBLoze9xp2T6kREwoPy90Z74j83RhhiT2Scd6tBLNQHUWicfzlWW9Cs";
 require("dotenv").config({ path: path.join(__dirname, "../config/.env") });
 const BASE = process.env.TESTNET_FX_WEBSOCKET_BASE_URL;
 const FxWallet=require("../models/fxWallet");
@@ -9,6 +9,7 @@ const FxOpenOrder = require("../models/fxOpenOrder");
 const FxTrade = require("../models/fxTrade");
 const PositionLog = require("../models/positionLog");
 const Wallet=require('../models/wallet')
+const TradePnl=require('../models/tradePnl')
 const User=require('../models/user')
 const email = "ankit@nextazy.com";
 const controller=require('./controller')
@@ -87,15 +88,32 @@ const fxPayload = async function () {
            // tradePresent.avgPrice=(((parseFloat(trade.avgPrice)*parseFloat(trade.executedQty))+(parseFloat(data.o.ap)*parseFloat(data.o.z)))/(parseFloat(trade.executedQty)+parseFloat(data.o.z))).toString()
            await tradePresent.save()
           }else{
-           //now trade side is opposite so subtract
+           //now trade side is opposite so pnl will will be created
            let tradeQty=parseFloat(tradePresent.executedQty)
            let dataQty=parseFloat(data.o.z)
-           if(tradeQty>dataQty){
+           let sellPrice=data.o.S=='SELL'?parseFloat(data.o.ap):parseFloat(tradePresent.avgPrice)
+           let buyPrice=data.o.S=='BUY'?parseFloat(data.o.ap):parseFloat(tradePresent.avgPrice)
+           if(tradeQty>dataQty){ 
+            
+            let pnlWc=(dataQty*(sellPrice-buyPrice))
+            let pnl=pnlWc-(parseFloat(tradePresent.commission)+parseFloat(data.o.n))
+            await new TradePnl({email:email,t:data.o.t,pnlWc:pnlWc,pnl:pnl}).save()
+            
             tradePresent.executedQty=(tradeQty-dataQty).toString()
             await tradePresent.save()
            }else if(tradeQty==dataQty){
+
+            let pnlWc=(dataQty*(sellPrice-buyPrice))
+            let pnl=pnlWc-(parseFloat(tradePresent.commission)+parseFloat(data.o.n))
+            await new TradePnl({email:email,t:data.o.t,pnlWc:pnlWc,pnl:pnl}).save()
+
             await FxTrade.findOneAndDelete({email:email,orderId:tradePresent.orderId})
            }else{
+
+            let pnlWc=(tradeQty*(sellPrice-buyPrice))
+            let pnl=pnlWc-(parseFloat(tradePresent.commission)+parseFloat(data.o.n))
+            await new TradePnl({email:email,t:data.o.t,pnlWc:pnlWc,pnl:pnl}).save()
+
             tradePresent.executedQty=(dataQty-tradeQty).toString()
             tradePresent.side=data.o.S
             await tradePresent.save()
@@ -106,22 +124,32 @@ const fxPayload = async function () {
          }
          else{await new FxTrade({
           email:email,
- clientOrderId:data.o.c,
- executedQty:data.o.z,
- orderId:data.o.i,
- avgPrice:data.o.ap,
- origQty:data.o.q,
- price:data.o.p,
- reduceOnly:data.o.R,
- side:data.o.S,
- positionSide:data.o.ps,
- status:data.o.X,
- stopPrice:data.o.sp,
- closePosition:data.o.cp,
- symbol:data.o.s,
- timeInForce:data.o.f,
- type:data.o.o,
- updateTime:data.T,
+          symbol:data.o.s,
+          clientOrderId:data.o.c,
+          side:data.o.S,
+          type:data.o.o,
+          timeInForce:data.o.f,
+          origQty:data.o.q,
+          originalPrice:data.o.p,
+          avgPrice:data.o.ap,
+          stopPrice:data.o.sp,
+          executionType:data.o.X,
+          orderStatus:data.o.X,
+          orderId:data.o.i,
+          executedQty:data.o.z,
+          commissionAsset:data.o.N,
+          commission:data.o.n,
+          tradeTime:data.o.T,
+          tradeId:data.o.t,
+          makerSide:data.o.m,
+          reduceOnly:data.o.R,
+          stopPriceWorkingType:data.o.wt,
+          originalOrderType:data.o.ot,
+          positionSide:data.o.ps,
+          closeAll:data.o.cp,
+          activatePrice:data.o.AP,
+          callbackRate:data.o.cr,
+          realizedProfit:data.o.rp
          }).save()}
         }
 

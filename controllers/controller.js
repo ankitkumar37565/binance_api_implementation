@@ -6,6 +6,7 @@ const FxTrade=require('../models/fxTrade')
 const PositionLog=require('../models/positionLog')
 const FxWallet=require('../models/fxWallet')
 const Wallet=require('../models/wallet')
+const TradePnl=require('../models/tradePnl')
 const bcrypt=require('bcrypt')
 const qs=require('qs')
 const WS=require('ws')
@@ -189,6 +190,10 @@ return res.status(200).send({success:true,message:'Trade History Fetched',data:t
 exports.getFxAccountBalanceDb=async function(req,res){
  let fxWallet=await FxWallet.findOne({email:req.user.email})
  return res.status(200).send({success:true,message:'fxAccount Balance Fetched',data:fxWallet})
+}
+exports.getPnl=async function(req,res){
+ let pnl=await TradePnl.aggregate([{$match:{email:req.user.email}},{$group:{_id:'$S',totalPnl:{$sum:"$pnl"}}}])
+ return res.status(200).send({success:true,message:'Pnl Fetched',data:pnl})
 }
 
 //trade controllers

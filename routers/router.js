@@ -21,6 +21,7 @@ router.get('/openPosition',auth,handle(controller.openPosition))
 router.get('/tradeHistory',auth,handle(controller.tradeHistory))
 router.get('/getAccountBalanceDb',auth,handle(controller.getAccountBalanceDb))
 router.get('/getFxAccountBalanceDb',auth,handle(controller.getFxAccountBalanceDb))
+router.get('/getPnl',auth,handle(controller.getPnl))
 
 //trade_routes
 router.post('/createOrder',auth,handle(controller.createOrder))
