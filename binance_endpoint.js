@@ -2,6 +2,7 @@
 
 const axios=require('axios')
 const qs=require('qs')
+const logger=require('./utils/logger')
 require('dotenv').config({path:__dirname+'/config/.env'})
 const base=process.env.TESTNET_FX_BASE_URL
 class binanceEndpoint {
@@ -25,7 +26,9 @@ async accountInformation(data, k, s) {
    const result = await axios(requestdata);
   //  console.log('-----------')
    return result;
-  }catch(e){return e.response}
+  }catch(e){
+    logger.error(e.response.data.msg)
+    return e.response}
 }
 
 //----------------------------------------------
@@ -41,7 +44,8 @@ async getPositionMode(data, k, s) {
 
    let result = await axios(requestdata);
    return result;
-  }catch(e){return e.response}
+  }catch(e){logger.error(e.response.data.msg)
+    return e.response}
  }
 
  //----------------------------------------------
@@ -57,7 +61,8 @@ async changePositionMode(data, k, s) {
   
    const result = await axios(requestdata);
    return result;
-  }catch(e){return e.response}
+  }catch(e){logger.error(e.response.data.msg)
+    return e.response}
  }
  //----------------------------------------------
  async changeInitialLeverage(data, k, s) {
@@ -72,7 +77,8 @@ async changePositionMode(data, k, s) {
   
     const result = await axios(requestdata);
     return result;
-  }catch(e){return e.response}
+  }catch(e){logger.error(e.response.data.msg)
+    return e.response}
   }
   
   //----------------------------------------------
@@ -103,6 +109,7 @@ async changePositionMode(data, k, s) {
     // console.log(e.response.data)
     // console.log(e.response.status)
     // console.log('---------')
+    logger.error(e.response.data.msg)
     return e.response
   }
   }
@@ -123,7 +130,8 @@ try{
   
   const result = await axios(requestdata);
   return result;
-}catch(e){return e.response}
+}catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 async queryOrder(data, k, s) {
@@ -138,7 +146,8 @@ try{
   
   const result = await axios(requestdata);
   return result;
-}catch(e){return e.response}
+}catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -154,7 +163,8 @@ try{
   
   const result = await axios(requestdata);
   return result;
-}catch(e){return e.response}
+}catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 async cancelAllOrder(data, k, s) {
@@ -169,7 +179,8 @@ async cancelAllOrder(data, k, s) {
   
     const result = await axios(requestdata);
     return result;
-  }catch(e){return e.response}
+  }catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -185,7 +196,8 @@ async currentOpenOrder(data, k, s) {
   
       const result = await axios(requestdata);
       return result;
-    }catch(e){return e.response}
+    }catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -201,7 +213,8 @@ let requestdata = {
   
     const result = await axios(requestdata);
     return result;
-  }catch(e){return e.response}
+  }catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -217,7 +230,8 @@ async allOrder(data, k, s) {
   
       const result = await axios(requestdata);
       return result;
-    }catch(e){return e.response}
+    }catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -233,7 +247,8 @@ try{
   
   const result = await axios(requestdata);
   return result;
-}catch(e){return e.response}
+}catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -249,7 +264,8 @@ try{
   
   const result = await axios(requestdata);
   return result;
-}catch(e){return e.response}
+}catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -265,7 +281,8 @@ try{
   
   const result = await axios(requestdata);
   return result;
-}catch(e){return e.response}
+}catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -281,7 +298,8 @@ try{
   
   const result = await axios(requestdata);
   return result;
-}catch(e){return e.response}
+}catch(e){logger.error(e.response.data.msg)
+    return e.response}
 }
 //----------------------------------------------
 
@@ -297,7 +315,8 @@ async userCommissionRate(data, k, s) {
   
       const result = await axios(requestdata);
       return result;
-    }catch(e){return e.response}
+    }catch(e){logger.error(e.response.data.msg)
+    return e.response}
   }
   
   //user stream endpoint
@@ -313,7 +332,8 @@ async userCommissionRate(data, k, s) {
   
         const result = await axios(requestdata);
         return result;
-      }catch(e){return e.response}
+      }catch(e){logger.error(e.response.data.msg)
+    return e.response}
   }
   async keepAliveUserDataStream(k) {
     let requestdata = {
@@ -327,7 +347,8 @@ async userCommissionRate(data, k, s) {
   
         const result = await axios(requestdata);
         return result;
-      }catch(e){return e.response}
+      }catch(e){logger.error(e.response.data.msg)
+    return e.response}
     }
     async closeUserDataStream(k) {
       let requestdata = {
@@ -341,7 +362,8 @@ async userCommissionRate(data, k, s) {
   
           const result = await axios(requestdata);
           return result;
-        }catch(e){return e.response}
+        }catch(e){logger.error(e.response.data.msg)
+    return e.response}
       }
 
   //----------------------------------------------
